@@ -9,11 +9,14 @@ export default async function Page({
   const sp = await searchParams;
   const tagQuery = sp.tagQuery as string | undefined;
   const tags = (sp.tags as string)?.split(',').filter(Boolean) ?? [];
+  const sharedUrl = sp.url as string | undefined;
+  const sharedText = sp.text as string | undefined;
+  const initialUrl = sharedUrl || sharedText || '';
 
   return (
     <div className='flex flex-col items-center justify-center h-screen'>
       <h1 className='text-3xl font-bold'>Welcome to social to Mealie</h1>
-      <RecipeFetcher tags={tags} />
+      <RecipeFetcher tags={tags} initialUrl={initialUrl} />
       <div className='w-fit min-w-96 m-4'>
         <GetTagSelect query={tagQuery} />
       </div>

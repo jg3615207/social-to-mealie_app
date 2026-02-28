@@ -6,20 +6,29 @@ import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import type { progressType, recipeResult } from '@/lib/types';
 import { CircleCheck, CircleX } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-export function RecipeFetcher({ tags }: { tags: string[] }) {
-  const [urlInput, setUrlInput] = useState('');
+export function RecipeFetcher({ tags, initialUrl }: { tags: string[], initialUrl?: string }) {
+  const [urlInput, setUrlInput] = useState(initialUrl || '');
   const [progress, setProgress] = useState<progressType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [recipes, setRecipe] = useState<recipeResult[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const hasAutoFetched = useRef(false);
 
-  async function fetchRecipe() {
+  useEffect(() => {
+    if (initialUrl && !hasAutoFetched.current) {
+      hasAutoFetched.current = true;
+      fetchRecipe(initialUrl);
+    }
+  }, [initialUrl]);
+
+  async function fetchRecipe(autoUrl?: string | React.MouseEvent<HTMLButtonElement>) {
     setLoading(true);
     setProgress(null);
     setError(null);
-    const urlList: string[] = urlInput.split(',').map((u) => u.trim());
+    const urlToUse = typeof autoUrl === 'string' ? autoUrl : urlInput;
+    const urlList: string[] = urlToUse.split(',').map((u) => u.trim());
 
     try {
       for (const url of urlList) {

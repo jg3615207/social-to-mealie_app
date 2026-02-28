@@ -1,97 +1,96 @@
-# Social Media to Mealie
+# Social to Mealie PWA
 
-Have you found a recipe on social media and don’t want to write it out yourself? This tool lets you import recipes from
-videos directly into [Mealie](https://github.com/mealie-recipes/mealie).
+This project is a modern, standalone Progressive Web App (PWA) client built for the [Social to Mealie](https://github.com/GerardPolloRebozado/social-to-mealie) backend service.
 
-**Tested social media platforms:**
+It allows you to easily import recipes from social media platforms directly into your [Mealie](https://github.com/mealie-recipes/mealie) instance using a beautiful, responsive mobile-first interface. Because it is a PWA, you can install it directly to your phone's home screen and use it just like a native app.
 
-- Instagram
-- TikTok
-- Facebook
-- YouTube Shorts
-- Pinterest
+This app is designed to work alongside the separate backend API.
 
-Other sites may work as well, since the tool uses `yt-dlp` to download videos. If you encounter issues with other
-websites, please open an issue.
+## 🌟 Features
 
-> **Note:** If you receive a `BAD_RECIPE` error, it may be due to Mealie’s recipe parsing. If you find a better prompt
-> or solution, feel free to open an issue or PR!
+- **PWA Ready**: Installable on iOS and Android devices directly from the browser. Looks and feels like a native app.
+- **Easy Recipe Import**: Paste a social media video link and quickly send it to the backend for AI parsing and import.
+- **Modern UI**: Clean, Dark Mode-ready interface built with Next.js, React, and Tailwind CSS.
+- **Standalone Frontend**: Can be hosted anywhere independently of the backend.
 
-## Features
+## 🚀 Getting Started
 
-- Import posts into Mealie with a link and a click
-- [iOS Shortcut v0.3](https://www.icloud.com/shortcuts/3778d926ed794dca95e658c6a4b5cf11) for easy importing
+To run this application, you will need the backend API running.
 
-## Screenshot
+### Prerequisites
 
-![Screenshot of the web interface](./public/screenshot.png "Screenshot of the web interface")
+- Node.js (v18+)
+- `pnpm` package manager
+- A running instance of the [social-to-mealie backend](https://github.com/GerardPolloRebozado/social-to-mealie).
 
-## Requirements
+### Local Development
 
-- [Mealie 1.9.0+](https://github.com/mealie-recipes/mealie) with AI provider
-  configured ([docs](https://docs.mealie.io/documentation/getting-started/installation/open-ai/))
-- [Docker](https://docs.docker.com/engine/install/)
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/jg3615207/social-to-mealie_app.git
+   cd social-to-mealie_app
+   ```
 
-## Deployment
+2. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
 
-<details open>
-    <summary>Docker Compose</summary>
+3. **Configure the Environment:**
+   You will need to point the frontend to your backend API. In your deployment or local `.env` file, ensure the API routes correctly point to your social-to-mealie instance.
+   *(Note: The app is currently configured to use `/api/import` which you can proxy to your backend).*
 
-1. Create a `docker-compose.yml` file based on
-   the [example](https://github.com/GerardPolloRebozado/social-to-mealie/blob/main/docker-compose.yml) in the repo and
-   fill in the required environment variables, if you prefer having them in a separate file you can create a `.env` file
-   based on the [example.env](https://github.com/GerardPolloRebozado/social-to-mealie/blob/main/example.env).
+4. **Run the development server:**
+   ```bash
+   pnpm dev
+   ```
 
-2. **Start the service with Docker Compose:**
-    ```sh
-    docker-compose up -d
-    ```
-    </details>
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-<details>
-    <summary>Docker Run</summary>
+## 📦 Docker Deployment
 
-```sh
-docker run --restart unless-stopped --name social-to-mealie \
-  -e OPENAI_URL=https://api.openai.com/v1 \
-  -e OPENAI_API_KEY=sk-... \
-  -e TRANSCRIPTION_MODEL=whisper-1 \
-  -e MEALIE_URL=https://mealie.example.com \
-  -e MEALIE_API_KEY=ey... \
-  -e MEALIE_GROUP_NAME=home \
-  -p 4000:3000 \
-  --security-opt no-new-privileges:true \
-  ghcr.io/gerardpollorebozado/social-to-mealie:latest
+This project includes a `Dockerfile` for easy deployment. The image is automatically built and pushed to Docker Hub upon updates to the `main` branch.
+
+You can pull the latest image using:
+
+```bash
+docker pull jg3615207/social-to-mealie_app:latest
 ```
 
-</details>
+### Running with Docker
 
-## Environment Variables
+Run the container using docker run:
 
-| Variable                  | Required | Description                                                                                                                            |
-|---------------------------|----------|----------------------------------------------------------------------------------------------------------------------------------------|
-| OPENAI_URL                | Yes      | URL for the OpenAI API or a compatible one                                                                                             |
-| OPENAI_API_KEY            | Yes      | API key for OpenAI or a compatible one                                                                                                 |
-| TRANSCRIPTION_MODEL       | No       | Whisper model to use, required when the local one is not filled                                                                        |
-| LOCAL_TRANSCRIPTION_MODEL | No       | Model ID from hugging face to use for local audio to text transcription, required when the provider doesn't support transcriptions API |
-| TEXT_MODEL                | Yes      | Text model to use for recipe generation                                                                                                |
-| MEALIE_URL                | Yes      | URL of your Mealie instance                                                                                                            |
-| MEALIE_API_KEY            | Yes      | API key for Mealie                                                                                                                     |
-| MEALIE_GROUP_NAME         | No       | Mealie group name, defaults to "home"                                                                                                  |
-| EXTRA_PROMPT              | No       | Additional instructions for AI, such as language translation                                                                           |
-| YTDLP_VERSION             | No       | Version of yt-dlp to use, defaults to latest                                                                                           |
-| COOKIES                   | No       | Cookies string for yt-dlp to access protected content `NAME=VALUE`                                                                     |
+```bash
+docker run -d \
+  -p 3000:3000 \
+  --name social-to-mealie-pwa \
+  jg3615207/social-to-mealie_app:latest
+```
 
-## Tested AI providers compatibility:
+Then, access the app at `http://your-server-ip:3000`.
 
-- OpenAI
-- GroqAI
+## 📱 How to Use (Walkthrough)
 
-## Partial support:
-Because theese providers don't support the transcriptions API it requires LOCAL_TRANSCRIPTION_MODEL to be set, recommended model: `Xenova/whisper-base`, you can use any model that is compatible with the ONNX runtime from hugging face
-- llmstudio 
-- ollama
+1. **Install the App**: 
+   - Open the web app URL in your mobile browser (Safari on iOS, Chrome on Android).
+   - In Safari: Tap the Share button and select "Add to Home Screen".
+   - In Chrome: Tap the menu and select "Install app".
+2. **Find a Recipe**: 
+   - Find a cooking video you like on Instagram, TikTok, YouTube Shorts, etc.
+   - Copy the link to the video.
+3. **Import to Mealie**:
+   - Open the `Social to Mealie` PWA on your phone.
+   - Paste the copied link into the input field.
+   - Tap **"Import Recipe"**.
+   - The app will send the request to the backend, which downloads the video, transcribes the audio, generates a recipe using AI, and saves it to your Mealie instance.
 
-It can work with any other provider that is compatible with the OpenAI API, if you find any issues please open an issue.
+## 🛠️ Built With
 
-[![Star History Chart](https://app.repohistory.com/api/svg?repo=GerardPolloRebozado/social-to-mealie&type=Date&background=0D1117&color=f86262)](https://app.repohistory.com/star-history)
+- [Next.js](https://nextjs.org/)
+- [React](https://reactjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Lucide Icons](https://lucide.dev/)
+
+## 📄 License
+This project is an independent frontend addition based on the functionality of the original `social-to-mealie` service.
